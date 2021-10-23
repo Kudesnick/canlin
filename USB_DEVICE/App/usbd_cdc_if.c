@@ -23,6 +23,7 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
+#include "console.h"
 
 /* USER CODE END INCLUDE */
 
@@ -158,6 +159,7 @@ static int8_t CDC_Init_HS(void)
   /* Set Application Buffers */
   USBD_CDC_SetTxBuffer(&hUsbDeviceHS, UserTxBufferHS, 0);
   USBD_CDC_SetRxBuffer(&hUsbDeviceHS, UserRxBufferHS);
+  console_init();
   return (USBD_OK);
   /* USER CODE END 8 */
 }
@@ -184,6 +186,9 @@ static int8_t CDC_DeInit_HS(void)
 static int8_t CDC_Control_HS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 {
   /* USER CODE BEGIN 10 */
+
+  static USBD_CDC_LineCodingTypeDef LineCoding;
+
   switch(cmd)
   {
   case CDC_SEND_ENCAPSULATED_COMMAND:
@@ -224,10 +229,12 @@ static int8_t CDC_Control_HS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
   case CDC_SET_LINE_CODING:
+    LineCoding = *(USBD_CDC_LineCodingTypeDef *)pbuf;
 
     break;
 
   case CDC_GET_LINE_CODING:
+    *(USBD_CDC_LineCodingTypeDef *)pbuf = LineCoding;
 
     break;
 
@@ -266,7 +273,10 @@ static int8_t CDC_Receive_HS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 11 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceHS, &Buf[0]);
-  USBD_CDC_ReceivePacket(&hUsbDeviceHS);
+
+  console_insert_data(Buf, Len);
+
+  // USBD_CDC_ReceivePacket(&hUsbDeviceHS);
   return (USBD_OK);
   /* USER CODE END 11 */
 }
@@ -316,6 +326,11 @@ static int8_t CDC_TransmitCplt_HS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+uint8_t CDC_Receive_Packet(void)
+{
+	return USBD_CDC_ReceivePacket(&hUsbDeviceHS);
+}
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
