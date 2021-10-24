@@ -110,8 +110,6 @@ uint8_t CDC_Transmit_HS(uint8_t* Buf, uint16_t Len);
 
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
 
-uint8_t CDC_Receive_Packet(void);
-
 /* USER CODE END EXPORTED_FUNCTIONS */
 
 /**

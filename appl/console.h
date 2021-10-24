@@ -15,7 +15,6 @@
  extern "C" {
 #endif
 
-extern void console_init(void);
 extern void console_insert_data(uint8_t* Buf, uint32_t *Len);
 extern bool console_routine(void);
 

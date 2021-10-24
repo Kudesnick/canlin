@@ -123,16 +123,27 @@ strsize_t param<uint32_t>::print_val(strbuf_t _str, const strsize_t _max_size)
 uint32_t test_param_val;
 param<uint32_t> test_param = param<uint32_t>(test_param_val, strbuf_t("param"));
 
-class console
+class console_cpp;
+class console_cpp
 {
 private:
 	microrl_t microrl_hndl;
 
-	uint8_t *buf; uint32_t len;
+	uint8_t buf[APP_RX_DATA_SIZE];
+	int len;
+
+	console_cpp()
+	{
+		microrl_init(&this->microrl_hndl, &console_cpp::microrl_print);
+		microrl_set_execute_callback(&this->microrl_hndl, &console_cpp::microrl_execute);
+	}
+
+	console_cpp(const console_cpp&) = delete ;
+	console_cpp& operator = (const console_cpp&) = delete ;
 
 	static void microrl_print(const char *_str)
 	{
-		while (CDC_Transmit_HS(reinterpret_cast<uint8_t*>(const_cast<char*>(_str)), strlen(_str)) != USBD_OK);
+		printf(_str);
 	}
 
 	static int microrl_execute(int argc, const char *const argv[])
@@ -151,49 +162,35 @@ private:
 
 	bool routine()
 	{
+		int len = fread(buf, 1, sizeof(buf), 0);
 		if (len == 0) return false;
 
-		for (uint32_t i = 0; i < len; i++)
+		for (auto i = 0; i < len; i++)
 		{
 			microrl_insert_char(&microrl_hndl, buf[i]);
 		}
 
 		len = 0;
-		return (CDC_Receive_Packet() == USBD_OK);
+		return true;
 	}
-
-	void init()
-	{
-		microrl_init(&this->microrl_hndl, &console::microrl_print);
-		microrl_set_execute_callback(&this->microrl_hndl, &console::microrl_execute);
-	}
-
-	friend void console_init(void);
-
-	friend void console_insert_data(uint8_t* Buf, uint32_t *Len);
 
 	friend bool console_routine(void);
 
 public:
-} con;
+	static console_cpp &instance()
+	{
+		static console_cpp console;
+		return console;
+	}
+};
 
 
 extern "C"
 {
 
-void console_init(void)
-{
-	con.init();
-}
-
-void console_insert_data(uint8_t* Buf, uint32_t *Len)
-{
-	con.buf = Buf;
-	con.len = *Len;
-}
-
 bool console_routine(void)
 {
+	console_cpp &con = console_cpp::instance();
 	return con.routine();
 }
 
