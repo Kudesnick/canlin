@@ -128,7 +128,7 @@ class console_cpp
 private:
 	microrl_t microrl_hndl;
 
-	uint8_t buf[512];
+	char buf[4];
 	int len;
 
 	console_cpp()
@@ -158,15 +158,14 @@ private:
 
 	bool routine()
 	{
-		int len = fread(buf, 1, sizeof(buf), stdin);
-		if (len == 0) return false;
+		fread(buf, 1, sizeof(buf), stdin);
 
-		for (auto i = 0; i < len; i++)
+		for (size_t i = 0; i < sizeof(buf); i++)
 		{
 			microrl_insert_char(&microrl_hndl, buf[i]);
 		}
 
-		return true;
+		return strlen(buf) > 0;
 	}
 
 	friend bool console_routine(void);

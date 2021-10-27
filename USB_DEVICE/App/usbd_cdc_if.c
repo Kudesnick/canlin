@@ -329,19 +329,38 @@ static int8_t CDC_TransmitCplt_HS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
+#if(0)
+int __io_getchar(void) {
+// Code to read a character from the UART
+	return 0;
+}
+#else
 // Override syscall.c
 int _read(int file, char *ptr, int len)
 {
-	if (len >= rx_len && rx_len > 0)
+	static uint32_t last_ptr = 0;
+	int result = len;
+
+	if (rx_len)
 	{
-		memcpy(ptr, UserRxBufferHS, rx_len);
-		int result = rx_len;
-		rx_len = 0;
-		USBD_CDC_ReceivePacket(&hUsbDeviceHS);
-		return result;
+		int tmp = rx_len < len ? rx_len : len;
+		memcpy(ptr, &UserRxBufferHS[last_ptr], tmp);
+		len      -= tmp;
+		rx_len   -= tmp;
+	    ptr      += tmp;
+	    last_ptr += tmp;
+
+		if (rx_len == 0)
+		{
+			last_ptr = 0;
+			USBD_CDC_ReceivePacket(&hUsbDeviceHS);
+		}
 	}
-	return 0;
+	memset(ptr, '\0', len);
+
+	return result;
 }
+#endif
 
 // Override syscall.c
 int _write(int file, char *ptr, int len)
