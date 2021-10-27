@@ -7,11 +7,10 @@
 
 #include "console.h"
 
-#include <stdint.h>
-#include <string.h>
+#include <cstring>
+#include <cstdio>
 
 #include "microrl.h"
-#include "usbd_cdc_if.h"
 
 /// Тип длины строки
 typedef uint8_t strsize_t;
@@ -42,7 +41,7 @@ public:
 	/// Парсинг параметра (зависит от типа параметра)
 	bool parse_val(int argc, const char *const argv[]);
 	/// Вывести значение параметра (зависит от типа)
-	strsize_t print_val(strbuf_t _str, const strsize_t _max_size);
+	int print_val();
 
 	/// Ищем параметр в строке
 	bool find(int argc, const char *const argv[])
@@ -62,13 +61,13 @@ public:
 	}
 
 	/// Печатаем параметр
-	strsize_t print(strbuf_t _str, const strsize_t _max_size)
+	int print()
 	{
-		strsize_t result = snprintf(_str, _max_size, "%s ", name);
+		auto result = printf("%s ", name);
 
-		if (result <= _max_size)
+		if (result >= 0)
 		{
-			result += print_val(&_str[result], _max_size - result);
+			result += print_val();
 		}
 
 		return result;
@@ -115,9 +114,9 @@ bool param<uint32_t>::parse_val(int argc, const char *const argv[])
 }
 
 template<>
-strsize_t param<uint32_t>::print_val(strbuf_t _str, const strsize_t _max_size)
+int param<uint32_t>::print_val()
 {
-	return snprintf(_str, _max_size, "%lu", value);
+	return printf("%lu", value);
 }
 
 uint32_t test_param_val;
@@ -129,7 +128,7 @@ class console_cpp
 private:
 	microrl_t microrl_hndl;
 
-	uint8_t buf[APP_RX_DATA_SIZE];
+	uint8_t buf[512];
 	int len;
 
 	console_cpp()
@@ -150,11 +149,8 @@ private:
 	{
 		if (test_param.find(argc, argv))
 		{
-			char buf[32];
-			test_param.print(buf, sizeof(buf) - 2);
-			buf[strlen(buf)+1] = '\0';
-			buf[strlen(buf)] = '\r';
-			microrl_print(buf);
+			test_param.print();
+			printf("\r");
 		}
 
 		return 0;
@@ -162,7 +158,7 @@ private:
 
 	bool routine()
 	{
-		int len = fread(buf, 1, sizeof(buf), 0);
+		int len = fread(buf, 1, sizeof(buf), stdin);
 		if (len == 0) return false;
 
 		for (auto i = 0; i < len; i++)
@@ -170,7 +166,6 @@ private:
 			microrl_insert_char(&microrl_hndl, buf[i]);
 		}
 
-		len = 0;
 		return true;
 	}
 

@@ -161,8 +161,7 @@ static int8_t CDC_Init_HS(void)
   /* Set Application Buffers */
   USBD_CDC_SetTxBuffer(&hUsbDeviceHS, UserTxBufferHS, 0);
   USBD_CDC_SetRxBuffer(&hUsbDeviceHS, UserRxBufferHS);
-  /* use stdio without buffering */
-  setvbuf(stdout, NULL, _IONBF, 0);
+
   return (USBD_OK);
   /* USER CODE END 8 */
 }
@@ -331,22 +330,24 @@ static int8_t CDC_TransmitCplt_HS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
 // Override syscall.c
-int _write(int file, char *data, int len)
+int _read(int file, char *ptr, int len)
 {
-	return (CDC_Transmit_HS((uint8_t *)data, len) == USBD_OK) ? len : 0;
+	if (len >= rx_len && rx_len > 0)
+	{
+		memcpy(ptr, UserRxBufferHS, rx_len);
+		int result = rx_len;
+		rx_len = 0;
+		USBD_CDC_ReceivePacket(&hUsbDeviceHS);
+		return result;
+	}
+	return 0;
 }
 
 // Override syscall.c
-int _read(int file, char *ptr, int len)
+int _write(int file, char *ptr, int len)
 {
-	if (len >= rx_len)
-	{
-		memcpy(ptr, UserRxBufferHS, len);
-		USBD_CDC_ReceivePacket(&hUsbDeviceHS);
-		return len;
-	}
-
-	return 0;
+	while (CDC_Transmit_HS((uint8_t *)ptr, len) != USBD_OK);
+	return len;
 }
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
