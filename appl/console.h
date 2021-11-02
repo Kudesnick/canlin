@@ -9,18 +9,19 @@
 #define APPL_CONSOLE_H_
 
 #ifdef __cplusplus
-	#include <cstdint>
-	#include <cstdbool>
+#include <cstdint>
+#include <cstdbool>
 #else
 	#include <stdint.h>
 	#include <stdbool.h>
 #endif
 
 #ifdef __cplusplus
- extern "C" {
+extern "C"
+{
 #endif
 
-extern void console_insert_data(uint8_t* Buf, uint32_t *Len);
+extern void console_insert_data(uint8_t *Buf, uint32_t *Len);
 extern bool console_routine(void);
 
 #ifdef __cplusplus

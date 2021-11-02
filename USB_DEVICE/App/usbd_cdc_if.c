@@ -338,35 +338,35 @@ int __io_getchar(void) {
 // Override syscall.c
 int _read(int file, char *ptr, int len)
 {
-	static uint32_t last_ptr = 0;
-	int result = len;
+    static uint32_t last_ptr = 0;
+    int result = len;
 
-	if (rx_len)
-	{
-		int tmp = rx_len < len ? rx_len : len;
-		memcpy(ptr, &UserRxBufferHS[last_ptr], tmp);
-		len      -= tmp;
-		rx_len   -= tmp;
-	    ptr      += tmp;
-	    last_ptr += tmp;
+    if (rx_len)
+    {
+        int tmp = rx_len < len ? rx_len : len;
+        memcpy(ptr, &UserRxBufferHS[last_ptr], tmp);
+        len      -= tmp;
+        rx_len   -= tmp;
+        ptr      += tmp;
+        last_ptr += tmp;
 
-		if (rx_len == 0)
-		{
-			last_ptr = 0;
-			USBD_CDC_ReceivePacket(&hUsbDeviceHS);
-		}
-	}
-	memset(ptr, '\0', len);
+        if (rx_len == 0)
+        {
+            last_ptr = 0;
+            USBD_CDC_ReceivePacket(&hUsbDeviceHS);
+        }
+    }
+    memset(ptr, '\0', len);
 
-	return result;
+    return result;
 }
 #endif
 
 // Override syscall.c
 int _write(int file, char *ptr, int len)
 {
-	while (CDC_Transmit_HS((uint8_t *)ptr, len) != USBD_OK);
-	return len;
+    while (CDC_Transmit_HS((uint8_t*) ptr, len) != USBD_OK);
+    return len;
 }
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
