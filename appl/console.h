@@ -1,26 +1,37 @@
-/*
- * console.h
- *
- *  Created on: Oct 13, 2021
- *      Author: kudes
+/**
+ * @file console.h
+ * @author your name (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2021-11-04
+ * 
+ * @copyright Copyright (c) 2021
+ * 
  */
 
-#ifndef APPL_CONSOLE_H_
-#define APPL_CONSOLE_H_
-
-#include <stdbool.h>
-#include <stdint.h>
+#pragma once
 
 #ifdef __cplusplus
- extern "C" {
+#include <cstdint>
+#include <cstdbool>
+#else
+	#include <stdint.h>
+	#include <stdbool.h>
 #endif
 
-extern void console_init(void);
-extern void console_insert_data(uint8_t* Buf, uint32_t *Len);
-extern bool console_routine(void);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+/**
+ * @brief Callback routine of console input parsing
+ * 
+ * @return true - new symbol(s) parsed
+ * @return false - no symbols to parse
+ */
+bool console_routine(void);
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* APPL_CONSOLE_H_ */

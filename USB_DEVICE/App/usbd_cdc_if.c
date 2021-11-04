@@ -98,6 +98,8 @@ uint8_t UserTxBufferHS[APP_TX_DATA_SIZE];
 
 /* USER CODE BEGIN PRIVATE_VARIABLES */
 
+int rx_len = 0;
+
 /* USER CODE END PRIVATE_VARIABLES */
 
 /**
@@ -159,7 +161,7 @@ static int8_t CDC_Init_HS(void)
   /* Set Application Buffers */
   USBD_CDC_SetTxBuffer(&hUsbDeviceHS, UserTxBufferHS, 0);
   USBD_CDC_SetRxBuffer(&hUsbDeviceHS, UserRxBufferHS);
-  console_init();
+
   return (USBD_OK);
   /* USER CODE END 8 */
 }
@@ -274,7 +276,7 @@ static int8_t CDC_Receive_HS(uint8_t* Buf, uint32_t *Len)
   /* USER CODE BEGIN 11 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceHS, &Buf[0]);
 
-  console_insert_data(Buf, Len);
+  rx_len = *Len;
 
   // USBD_CDC_ReceivePacket(&hUsbDeviceHS);
   return (USBD_OK);
@@ -327,9 +329,58 @@ static int8_t CDC_TransmitCplt_HS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
 
-uint8_t CDC_Receive_Packet(void)
+#if(0)
+int __io_getchar(void) {
+// Code to read a character from the UART
+    static uint32_t last_ptr = 0;
+
+    int result = EOF;
+
+    if (rx_len)
+    {
+        result = UserRxBufferHS[last_ptr++];
+        if (--rx_len == 0)
+        {
+            last_ptr = 0;
+            USBD_CDC_ReceivePacket(&hUsbDeviceHS);
+        }
+    }
+
+    return result;
+}
+#else
+// Override syscall.c
+int _read(int file, char *ptr, int len)
 {
-	return USBD_CDC_ReceivePacket(&hUsbDeviceHS);
+    static uint32_t last_ptr = 0;
+    int result = len;
+
+    if (rx_len)
+    {
+        int tmp = rx_len < len ? rx_len : len;
+        memcpy(ptr, &UserRxBufferHS[last_ptr], tmp);
+        len      -= tmp;
+        rx_len   -= tmp;
+        ptr      += tmp;
+        last_ptr += tmp;
+
+        if (rx_len == 0)
+        {
+            last_ptr = 0;
+            USBD_CDC_ReceivePacket(&hUsbDeviceHS);
+        }
+    }
+    memset(ptr, '\0', len);
+
+    return result;
+}
+#endif
+
+// Override syscall.c
+int _write(int file, char *ptr, int len)
+{
+    while (CDC_Transmit_HS((uint8_t*) ptr, len) != USBD_OK);
+    return len;
 }
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
