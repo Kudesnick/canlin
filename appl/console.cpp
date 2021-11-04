@@ -5,6 +5,7 @@
  *      Author: kudesnick
  */
 
+#include <param.h>
 #include "console.h"
 
 #include <cstring>
@@ -12,111 +13,10 @@
 
 #include "microrl.h"
 
-/// Тип длины строки
-typedef uint8_t strsize_t;
-
-/// Тип строкового буфера
-typedef char *const strbuf_t;
-
-/**
- * Парсинг командной строки
- */
-template<typename T>
-class param
-{
-private:
-    /// Имя параметра
-    const strbuf_t name;
-public:
-    /// Значение параметра
-    /// Ссылочное значение дает возможность использовать поля внешних структур
-    T &value;
-
-    /// Конструктор
-    param(T &_value, const strbuf_t _name) :
-        name(_name), value(_value)
-    {
-    }
-
-    /// Парсинг параметра (зависит от типа параметра)
-    bool parse_val(int argc, const char *const argv[]);
-    /// Вывести значение параметра (зависит от типа)
-    int print_val();
-
-    /// Ищем параметр в строке
-    bool find(int argc, const char *const argv[])
-    {
-        bool result = false;
-
-        for (auto i = 0; i < argc; i++)
-        {
-            if (strcmp(name, argv[i]) == 0)
-            {
-                result = parse_val(argc - i, &argv[i]);
-                break;
-            }
-        }
-
-        return result;
-    }
-
-    /// Печатаем параметр
-    int print()
-    {
-        auto result = printf("%s ", name);
-
-        if (result >= 0)
-        {
-            result += print_val();
-        }
-
-        return result;
-    }
-};
-
-/// Парсинг десятичного или hex числа
-template<>
-bool param<uint32_t>::parse_val(int argc, const char *const argv[])
-{
-    bool result = false;
-    if (argc < 2) return result;
-
-    const char *ptr = argv[1];
-    uint32_t val = 0;
-    const uint8_t base = (strstr(ptr, "0x") == ptr) ? 16 : 10;
-    if (base == 16) ptr += 2;
-
-    for (; *ptr != '\0'; ptr++)
-    {
-        result = true;
-        uint8_t tmp;
-
-        if (*ptr >= '0' && *ptr <= '9') tmp = *ptr - '0';
-        else if (base == 16 && *ptr >= 'A' && *ptr <= 'F') tmp = *ptr + 10 - 'A';
-        else if (base == 16 && *ptr >= 'a' && *ptr <= 'f') tmp = *ptr + 10 - 'a';
-        else
-        {
-            result = false;
-            break;
-        }
-
-        val *= base;
-        val += tmp;
-    }
-
-    if (result) value = val;
-
-    return result;
-}
-
-template<>
-int param<uint32_t>::print_val()
-{
-    return printf("%lu", value);
-}
-
 uint32_t test_param_val;
-param<uint32_t> test_param = param<uint32_t>(test_param_val, strbuf_t("param"));
+bool test_bool_val;
+param<uint32_t> test_param = param<uint32_t>(test_param_val, (strbuf_t)"param");
+param<bool> test_bool = param<bool>(test_bool_val, (strbuf_t)"flag");
 
 class console_cpp;
 class console_cpp
@@ -149,6 +49,12 @@ private:
             printf("\r");
         }
 
+        if (test_bool.find(argc, argv))
+        {
+            test_bool.print();
+            printf("\r");
+        }
+
         return 0;
     }
 
@@ -156,12 +62,18 @@ private:
     {
         fread(buf, 1, sizeof(buf), stdin);
 
+        bool result = false;
+
         for (size_t i = 0; i < sizeof(buf); i++)
         {
-            microrl_insert_char(&microrl_hndl, buf[i]);
+            if (buf[i] != '\0')
+            {
+                microrl_insert_char(&microrl_hndl, buf[i]);
+                result = true;
+            }
         }
 
-        return strlen(buf) > 0;
+        return result;
     }
 
     friend bool console_routine(void);

@@ -54,7 +54,7 @@ brk:
 ### common sending format
 
 ```
-<iface> <type> <msg> [| <repeat interval> [<repeat counter>]]
+<iface> <type> <msg> [| <repeat interval> [<repeat counter>] [<start delay>]]
 iface:
     CAN (A|B|C) or LIN (A|B)
 ```

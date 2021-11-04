@@ -332,7 +332,21 @@ static int8_t CDC_TransmitCplt_HS(uint8_t *Buf, uint32_t *Len, uint8_t epnum)
 #if(0)
 int __io_getchar(void) {
 // Code to read a character from the UART
-	return 0;
+    static uint32_t last_ptr = 0;
+
+    int result = EOF;
+
+    if (rx_len)
+    {
+        result = UserRxBufferHS[last_ptr++];
+        if (--rx_len == 0)
+        {
+            last_ptr = 0;
+            USBD_CDC_ReceivePacket(&hUsbDeviceHS);
+        }
+    }
+
+    return result;
 }
 #else
 // Override syscall.c
