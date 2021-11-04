@@ -27,7 +27,7 @@ template<> bool param<bool>::parse_val(int argc, const char *const argv[])
 }
 
 /// Printing value of bool
-template<> int param<bool>::print_val()
+template<> int param<bool>::print_val(const strbuf_t _end)
 {
     return printf("%s", value ? "true" : "false");
 }

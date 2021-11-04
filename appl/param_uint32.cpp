@@ -48,7 +48,7 @@ template<> bool param<uint32_t>::parse_val(int argc, const char *const argv[])
 }
 
 /// Printing value of uint32_t
-template<> int param<uint32_t>::print_val()
+template<> int param<uint32_t>::print_val(const strbuf_t _end)
 {
     return printf("%lu", value);
 }

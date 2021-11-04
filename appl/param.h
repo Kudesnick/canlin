@@ -44,7 +44,7 @@ private:
      * 
      * @return int - count of outputed characters
      */
-    int print_val();
+    int print_val(const strbuf_t _end);
 
 public:
     /**
@@ -76,7 +76,7 @@ public:
      * 
      * @return int - count of outputed characters
      */
-    int print();
+    int print(const strbuf_t _end = (strbuf_t)"\r");
 };
 
 
@@ -101,13 +101,18 @@ template<typename T> bool param<T>::find(int argc, const char *const argv[])
     return result;
 }
 
-template<typename T> int param<T>::print()
+template<typename T> int param<T>::print(const strbuf_t _end)
 {
     auto result = printf("%s ", name);
 
     if (result >= 0)
     {
-        result += print_val();
+        result += print_val(_end);
+    }
+
+    if (_end != nullptr)
+    {
+        result += printf(_end);
     }
 
     return result;
