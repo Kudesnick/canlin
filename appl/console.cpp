@@ -63,7 +63,7 @@ private:
     static int microrl_execute(int argc, const char *const argv[])
     {
         // insert comand's parsers
-        param_cmd_test.find(argc, argv);
+        param_cmd_test_find(argc, argv);
 
         return 0;
     }

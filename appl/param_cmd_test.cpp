@@ -14,6 +14,14 @@
 #include <cstdio>
 #include "param_cmd_test.h"
 
+
+/// environment
+struct cmd_test
+{
+    uint32_t param; ///< test uint32_t parameter
+    bool flag; ///< test boolean flag
+};
+
 /// Environment
 cmd_test cmd_test_val;
 
@@ -26,7 +34,7 @@ param<bool> test_bool = param<bool>(cmd_test_val.flag, (strbuf_t)"flag");
 param<cmd_test> param_cmd_test = {cmd_test_val, (strbuf_t)"test"};
 
 /// Parsing of parameter.
-template<> bool param<cmd_test>::parse_val(int argc, const char *const argv[])
+template<> bool param<cmd_test>::parse_val(int argc, strbuf_t argv[])
 {
     bool result = false;
 
@@ -39,7 +47,7 @@ template<> bool param<cmd_test>::parse_val(int argc, const char *const argv[])
 }
 
 /// Printing value.
-template<> int param<cmd_test>::print_val(const strbuf_t _end)
+template<> int param<cmd_test>::print_val(strbuf_t _end)
 {
     int result = 0;
 
@@ -48,4 +56,9 @@ template<> int param<cmd_test>::print_val(const strbuf_t _end)
     result += test_bool.print();
 
     return result;
+}
+
+bool param_cmd_test_find(int argc, strbuf_t argv[])
+{
+    return param_cmd_test.find(argc, argv);
 }

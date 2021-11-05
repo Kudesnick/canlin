@@ -14,7 +14,7 @@
 #include <cstdio>
 
 /// Parsing decimal or hex parameter
-template<> bool param<uint32_t>::parse_val(int argc, const char *const argv[])
+template<> bool param<uint32_t>::parse_val(int argc, strbuf_t argv[])
 {
     bool result = false;
     if (argc < 2) return result;
@@ -48,7 +48,7 @@ template<> bool param<uint32_t>::parse_val(int argc, const char *const argv[])
 }
 
 /// Printing value of uint32_t
-template<> int param<uint32_t>::print_val(const strbuf_t _end)
+template<> int param<uint32_t>::print_val(strbuf_t _end)
 {
     return printf("%lu", value);
 }

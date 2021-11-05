@@ -15,7 +15,7 @@
 #include <cstdio>
 
 /// String buffer
-typedef char *const strbuf_t;
+typedef const char *const strbuf_t;
 
 /**
  * @brief Command line parser
@@ -27,7 +27,7 @@ template<typename T>
 class param
 {
 private:
-    const strbuf_t name; ///< Name of finded parameter
+    strbuf_t name; ///< Name of finded parameter
 
     /**
      * @brief Parsing of parameter. Depends of parameter type
@@ -37,14 +37,14 @@ private:
      * @return true - Parameter is founded
      * @return false - parameter not founded
      */
-    bool parse_val(int argc, const char *const argv[]);
+    bool parse_val(int argc, strbuf_t argv[]);
 
     /**
      * @brief Print text of parameter value to console. Depends of parameter type
      * 
      * @return int - count of outputed characters
      */
-    int print_val(const strbuf_t _end);
+    int print_val(strbuf_t _end);
 
 public:
     /**
@@ -59,7 +59,7 @@ public:
      * @param _value link to value
      * @param _name name of parameter
      */
-    param(T &_value, const strbuf_t _name);
+    param(T &_value, strbuf_t _name);
 
     /**
      * @brief Find parameter from argument list
@@ -69,23 +69,23 @@ public:
      * @return true - Parameter is founded
      * @return false - parameter not founded
      */
-    bool find(int argc, const char *const argv[]);
+    bool find(int argc, strbuf_t argv[]);
 
     /**
      * @brief Print text of parameter name and value to console
      * 
      * @return int - count of outputed characters
      */
-    int print(const strbuf_t _end = (strbuf_t)"\r");
+    int print(strbuf_t _end = (strbuf_t)"\r");
 };
 
 
-template<typename T> param<T>::param(T &_value, const strbuf_t _name) :
+template<typename T> param<T>::param(T &_value, strbuf_t _name) :
     name(_name), value(_value)
 {
 }
 
-template<typename T> bool param<T>::find(int argc, const char *const argv[])
+template<typename T> bool param<T>::find(int argc, strbuf_t argv[])
 {
     bool result = false;
 
@@ -101,7 +101,7 @@ template<typename T> bool param<T>::find(int argc, const char *const argv[])
     return result;
 }
 
-template<typename T> int param<T>::print(const strbuf_t _end)
+template<typename T> int param<T>::print(strbuf_t _end)
 {
     auto result = printf("%s ", name);
 

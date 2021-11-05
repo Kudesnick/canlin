@@ -14,7 +14,7 @@
 #include <cstdio>
 
 /// Parsing flag
-template<> bool param<bool>::parse_val(int argc, const char *const argv[])
+template<> bool param<bool>::parse_val(int argc, strbuf_t argv[])
 {
     bool result = (argc >= 1);
 
@@ -27,7 +27,7 @@ template<> bool param<bool>::parse_val(int argc, const char *const argv[])
 }
 
 /// Printing value of bool
-template<> int param<bool>::print_val(const strbuf_t _end)
+template<> int param<bool>::print_val(strbuf_t _end)
 {
     return printf("%s", value ? "true" : "false");
 }
