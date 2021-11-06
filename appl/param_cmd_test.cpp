@@ -9,10 +9,9 @@
  * 
  */
 
-#include <param.h>
 #include <cstring>
 #include <cstdio>
-
+#include "param.h"
 
 /// environment
 struct cmd_test
