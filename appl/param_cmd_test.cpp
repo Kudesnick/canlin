@@ -12,7 +12,6 @@
 #include <param.h>
 #include <cstring>
 #include <cstdio>
-#include "param_cmd_test.h"
 
 
 /// environment
@@ -20,10 +19,7 @@ struct cmd_test
 {
     uint32_t param; ///< test uint32_t parameter
     bool flag; ///< test boolean flag
-};
-
-/// Environment
-cmd_test cmd_test_val;
+} cmd_test_val;
 
 /// Parser of parameter "param"
 param<uint32_t> test_param = param<uint32_t>(cmd_test_val.param, (strbuf_t)"param");
@@ -58,7 +54,10 @@ template<> int param<cmd_test>::print_val(strbuf_t _end)
     return result;
 }
 
-bool param_cmd_test_find(int argc, strbuf_t argv[])
+finder_list find =
 {
-    return param_cmd_test.find(argc, argv);
-}
+    [](int argc, strbuf_t argv[])
+    {
+        return param_cmd_test.find(argc, argv);
+    }
+};

@@ -17,9 +17,6 @@
 
 #include "microrl.h"
 
-// Include command's headers
-#include "param_cmd_test.h"
-
 /**
  * @brief Main class for parsing and execution command from  console input
  * @details This class is singtone
@@ -63,7 +60,12 @@ private:
     static int microrl_execute(int argc, const char *const argv[])
     {
         // insert comand's parsers
-        param_cmd_test_find(argc, argv);
+        finder_list::enumerate([argc, argv](finder_list *&_item)
+        {
+            _item->routine(argc, argv);
+
+            return true;
+        });
 
         return 0;
     }

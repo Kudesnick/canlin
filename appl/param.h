@@ -13,9 +13,22 @@
 
 #include <cstring>
 #include <cstdio>
+#include "cpp_list.h"
 
 /// String buffer
 typedef const char *const strbuf_t;
+
+/// Find functions list
+class finder_list: public cpp_list<finder_list>
+{
+public:
+    bool (*const routine)(int argc, strbuf_t argv[]);
+
+    finder_list(typeof(routine) _routine):
+        cpp_list(),
+        routine(_routine)
+    {};
+};
 
 /**
  * @brief Command line parser
