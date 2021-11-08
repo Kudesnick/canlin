@@ -62,7 +62,7 @@ private:
         // insert comand's parsers
         finder_list::enumerate([argc, argv](finder_list *&_item)
         {
-            _item->routine(argc, argv);
+            _item->find(argc, argv);
 
             return true;
         });

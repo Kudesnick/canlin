@@ -27,14 +27,14 @@ Showed or cleared all messages in queue to send
 ### CAN settings
 
 ```
-CAN (A|B|C) sett <baudrate>[type] [flags]
+CAN (A|B|C) sett <baudrate> [fd [<data baudrate>]] [terminator [n]] [mode (normal|silent|test)]
 baudrate:
-    %d [SJW %d] [S1 %d] [S2 %d]
+    %d
 type:
     fd [<data baudrate>] - use FD-CAN with special data baudrate.
 flags:
-    t - terminator on
-    s - silent mode
+    terminator - terminator on
+    mode - can transiever mode
 ```
 
 ### UART settings

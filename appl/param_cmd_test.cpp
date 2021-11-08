@@ -26,7 +26,10 @@ param<uint32_t> test_param = param<uint32_t>(cmd_test_val.param, (strbuf_t)"para
 param<bool> test_bool = param<bool>(cmd_test_val.flag, (strbuf_t)"flag");
 
 /// Object of command "test"
-param<cmd_test> param_cmd_test = {cmd_test_val, (strbuf_t)"test"};
+class param_cmd_test_cpp: public param_cmd<cmd_test>
+{
+    using param_cmd::param_cmd;
+} param_cmd_test = {cmd_test_val, (strbuf_t)"test"};
 
 /// Parsing of parameter.
 template<> bool param<cmd_test>::parse_val(int argc, strbuf_t argv[])
@@ -52,11 +55,3 @@ template<> int param<cmd_test>::print_val(strbuf_t _end)
 
     return result;
 }
-
-finder_list find =
-{
-    [](int argc, strbuf_t argv[])
-    {
-        return param_cmd_test.find(argc, argv);
-    }
-};

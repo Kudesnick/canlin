@@ -22,13 +22,12 @@ typedef const char *const strbuf_t;
 class finder_list: public cpp_list<finder_list>
 {
 public:
-    bool (*const routine)(int argc, strbuf_t argv[]);
+    virtual bool find(int argc, strbuf_t argv[]) = 0;
 
-    finder_list(typeof(routine) _routine):
-        cpp_list(),
-        routine(_routine)
-    {};
+    using
+        cpp_list::cpp_list;
 };
+
 
 /**
  * @brief Command line parser
@@ -90,6 +89,22 @@ public:
      * @return int - count of outputed characters
      */
     int print(strbuf_t _end = (strbuf_t)"\r");
+};
+
+
+template<typename T>
+class param_cmd: public param<T>, finder_list
+{
+public:
+    bool find(int argc, strbuf_t argv[])
+    {
+        return param<T>::find(argc, argv);
+    }
+
+    param_cmd(T &_value, strbuf_t _name):
+        param<T>(_value, _name),
+        finder_list()
+    {};
 };
 
 
