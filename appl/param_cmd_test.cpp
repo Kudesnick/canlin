@@ -15,21 +15,18 @@
 
 /// environment
 struct cmd_test
-{
-    uint32_t param; ///< test uint32_t parameter
-    bool flag; ///< test boolean flag
-} cmd_test_val;
+{};
 
 /// Parser of parameter "param"
-param<uint32_t> test_param = param<uint32_t>(cmd_test_val.param, (strbuf_t)"param");
+param<uint32_t> test_param = {(strbuf_t)"param", 0};
 /// Parser of parameter "flag"
-param<bool> test_bool = param<bool>(cmd_test_val.flag, (strbuf_t)"flag");
+param<bool> test_bool = {(strbuf_t)"flag", false};
 
 /// Object of command "test"
 class param_cmd_test_cpp: public param_cmd<cmd_test>
 {
     using param_cmd::param_cmd;
-} param_cmd_test = {cmd_test_val, (strbuf_t)"test"};
+} param_cmd_test = {(strbuf_t)"test", {}};
 
 /// Parsing of parameter.
 template<> bool param<cmd_test>::parse_val(int argc, strbuf_t argv[])

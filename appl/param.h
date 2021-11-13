@@ -58,12 +58,15 @@ private:
      */
     int print_val(strbuf_t _end);
 
+protected:
+    T value;
+
 public:
     /**
      * @brief Value of parameter
      * @details If this type listed as link, can be use external register or variable
      */
-    T &value;
+    const T &val = value;
 
     /**
      * @brief Construct a new param object
@@ -71,7 +74,7 @@ public:
      * @param _value link to value
      * @param _name name of parameter
      */
-    param(T &_value, strbuf_t _name);
+    param(strbuf_t name, const T value);
 
     /**
      * @brief Find parameter from argument list
@@ -101,15 +104,15 @@ public:
         return param<T>::find(argc, argv);
     }
 
-    param_cmd(T &_value, strbuf_t _name):
-        param<T>(_value, _name),
+    param_cmd(strbuf_t name, const T value):
+        param<T>(name, value),
         finder_list()
     {};
 };
 
 
-template<typename T> param<T>::param(T &_value, strbuf_t _name) :
-    name(_name), value(_value)
+template<typename T> param<T>::param(strbuf_t name, const T value):
+    name(name), value(value)
 {
 }
 
