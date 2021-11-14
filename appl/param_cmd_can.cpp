@@ -48,7 +48,7 @@ public:
 /// Parsing of parameter.
 template<> bool param<can_litera>::find(int argc, strbuf_t argv[])
 {
-    return (can_iface_cpp *)this->find(argc, argv);
+    return false;
 }
 
 bool can_iface_cpp::find(int argc, strbuf_t argv[])

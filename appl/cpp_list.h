@@ -44,7 +44,7 @@ public:
     };
 
     /// Возвращает указатель на первый элемент списка
-    static cpp_list *const& first() {return p_first_;};
+    static inline cpp_list *const& first = p_first_;
 
     /// Возвращает указатель на следующий элемент списка
     cpp_list *const& next = p_next_;
@@ -60,8 +60,8 @@ public:
      */
     template<typename _lambda_t> static void enumerate(_lambda_t _enum_func)
     {
-        for (_T *el_ptr = static_cast<_T *>(el_ptr->first());
-             el_ptr != NULL && !_enum_func(el_ptr);
+        for (_T *el_ptr = static_cast<_T *>(el_ptr->first);
+             el_ptr != nullptr && !_enum_func(el_ptr);
              el_ptr = static_cast<_T *>(el_ptr->next));
     };
 };
